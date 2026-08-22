@@ -199,3 +199,47 @@ func TestAttackRejectsSourceThatIsNotAttackingPlayerPosition(t *testing.T) {
 		t.Errorf("defending territory owner = %q, want %q", *defendingTerritory.Owner, scenario.defenderID)
 	}
 }
+
+func TestAttackRejectsPlayerWithoutPosition(t *testing.T) {
+	scenario := newAttackScenario(t, 3, 2)
+	attackingPlayer := playerByID(scenario.room.Players, scenario.attackerID)
+	if attackingPlayer == nil {
+		t.Fatal("attacking player not found")
+	}
+	attackingPlayer.Position = nil
+
+	updatedRoom, err := Attack(
+		scenario.room,
+		scenario.attackerID,
+		scenario.fromID,
+		scenario.toID,
+	)
+
+	if err != ErrInvalidAttackNotPresent {
+		t.Errorf("error = %v, want ErrInvalidAttackNotPresent", err)
+	}
+	if updatedRoom.Territories[scenario.fromID].Units != 3 {
+		t.Errorf("attacker units = %d, want 3", updatedRoom.Territories[scenario.fromID].Units)
+	}
+	defendingTerritory := updatedRoom.Territories[scenario.toID]
+	if defendingTerritory.Owner == nil {
+		t.Fatal("defending territory owner = nil, want original defender ID")
+	}
+	if *defendingTerritory.Owner != scenario.defenderID {
+		t.Errorf("defending territory owner = %q, want %q", *defendingTerritory.Owner, scenario.defenderID)
+	}
+}
+
+func TestAttackRejectsSetupPhase(t *testing.T) {
+	room := fillRoomWithPlayers(MaxPlayers)
+	actorID := *room.ActivePlayerID
+
+	updatedRoom, err := Attack(room, actorID, "t1", "t2")
+
+	if err != ErrNotPlaying {
+		t.Errorf("error = %v, want ErrNotPlaying", err)
+	}
+	if updatedRoom.Phase != PhaseSetup {
+		t.Errorf("phase = %q, want %q", updatedRoom.Phase, PhaseSetup)
+	}
+}

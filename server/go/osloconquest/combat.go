@@ -18,7 +18,7 @@ func Attack(room Room, actorID PlayerID, fromID, toID MapNodeID) (Room, error) {
 	}
 
 	if room.Phase != PhasePlaying {
-		return room, ErrGameNotStarted
+		return room, ErrNotPlaying
 	}
 	room = room.Clone()
 
