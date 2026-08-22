@@ -144,3 +144,58 @@ func TestAttackRejectsWhenAttackerDoesNotHaveMoreUnitsWithoutChangingState(t *te
 		t.Errorf("valid moves = %v, want [%q]", attackingPlayer.ValidMoves, scenario.toID)
 	}
 }
+
+func TestAttackConquersNeutralTerritory(t *testing.T) {
+	scenario := newAttackScenario(t, 3, 0)
+	neutralTerritory := scenario.room.Territories[scenario.toID]
+	neutralTerritory.Owner = nil
+	scenario.room.Territories[scenario.toID] = neutralTerritory
+
+	updatedRoom, err := Attack(scenario.room, scenario.attackerID, scenario.fromID, scenario.toID)
+	if err != nil {
+		t.Fatalf("Attack returned an error: %v", err)
+	}
+
+	conqueredTerritory := updatedRoom.Territories[scenario.toID]
+	if conqueredTerritory.Owner == nil {
+		t.Fatal("conquered territory owner = nil, want attacker ID")
+	}
+	if *conqueredTerritory.Owner != scenario.attackerID {
+		t.Errorf("conquered territory owner = %q, want %q", *conqueredTerritory.Owner, scenario.attackerID)
+	}
+	if conqueredTerritory.Units != 2 {
+		t.Errorf("conquered territory units = %d, want 2", conqueredTerritory.Units)
+	}
+}
+
+func TestAttackRejectsSourceThatIsNotAttackingPlayerPosition(t *testing.T) {
+	scenario := newAttackScenario(t, 3, 2)
+	remoteTerritoryID := MapNodeID("t3")
+	scenario.room.Territories[remoteTerritoryID] = MapNode{
+		ID:    remoteTerritoryID,
+		Owner: &scenario.attackerID,
+		Units: 3,
+	}
+
+	updatedRoom, err := Attack(
+		scenario.room,
+		scenario.attackerID,
+		remoteTerritoryID,
+		scenario.toID,
+	)
+
+	if err != ErrInvalidAttackNotPresent {
+		t.Errorf("error = %v, want ErrInvalidAttackNotPresent", err)
+	}
+	remoteTerritory := updatedRoom.Territories[remoteTerritoryID]
+	if remoteTerritory.Units != 3 {
+		t.Errorf("remote territory units = %d, want 3", remoteTerritory.Units)
+	}
+	defendingTerritory := updatedRoom.Territories[scenario.toID]
+	if defendingTerritory.Owner == nil {
+		t.Fatal("defending territory owner = nil, want original defender ID")
+	}
+	if *defendingTerritory.Owner != scenario.defenderID {
+		t.Errorf("defending territory owner = %q, want %q", *defendingTerritory.Owner, scenario.defenderID)
+	}
+}

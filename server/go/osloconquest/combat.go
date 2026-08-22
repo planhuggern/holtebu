@@ -6,8 +6,10 @@ import (
 )
 
 var (
-	ErrInvalidAttack   = errors.New("invalid attack: destination is not an enemy territory")
-	ErrAttackWouldLose = errors.New("attack would result in loss: attacker has fewer units than defender")
+	ErrInvalidAttack           = errors.New("invalid attack: destination is not an enemy territory")
+	ErrInvalidAttackNotOwned   = errors.New("invalid attack: attacking territory not owned by attacker")
+	ErrInvalidAttackNotPresent = errors.New("invalid attack: attacker not present in attacking territory")
+	ErrAttackWouldLose         = errors.New("attack would result in loss: attacker has fewer units than defender")
 )
 
 func Attack(room Room, actorID PlayerID, fromID, toID MapNodeID) (Room, error) {
@@ -22,25 +24,28 @@ func Attack(room Room, actorID PlayerID, fromID, toID MapNodeID) (Room, error) {
 
 	attackingTerritory := room.Territories[fromID]
 	if attackingTerritory.Owner == nil || *attackingTerritory.Owner != actorID {
-		return room, ErrInvalidAttack
+		return room, ErrInvalidAttackNotOwned
+	}
+	attackingPlayer := playerByID(room.Players, actorID)
+	if attackingPlayer == nil {
+		return room, ErrPlayerNotFound
+	}
+	if attackingPlayer.Position == nil ||
+		*attackingPlayer.Position != fromID {
+		return room, ErrInvalidAttackNotPresent
 	}
 
 	defendingTerritory := room.Territories[toID]
-	if defendingTerritory.Owner == nil || *defendingTerritory.Owner == actorID {
+	if defendingTerritory.Owner != nil && *defendingTerritory.Owner == actorID {
+		return room, ErrInvalidAttack
+	}
+
+	if !slices.Contains(attackingPlayer.ValidMoves, toID) {
 		return room, ErrInvalidAttack
 	}
 
 	if attackingTerritory.Units <= defendingTerritory.Units {
 		return room, ErrAttackWouldLose
-	}
-
-	attackingPlayer := playerByID(room.Players, actorID)
-	if attackingPlayer == nil {
-		return room, ErrPlayerNotFound
-	}
-
-	if !slices.Contains(attackingPlayer.ValidMoves, toID) {
-		return room, ErrInvalidAttack
 	}
 
 	attackingPlayer.Position = &toID
