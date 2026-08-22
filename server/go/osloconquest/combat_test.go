@@ -243,3 +243,31 @@ func TestAttackRejectsSetupPhase(t *testing.T) {
 		t.Errorf("phase = %q, want %q", updatedRoom.Phase, PhaseSetup)
 	}
 }
+
+func TestAttackSetsWinnerWhenConquestReachesSixtyPercentThreshold(t *testing.T) {
+	scenario := newAttackScenario(t, 3, 2)
+	scenario.room.Territories["t3"] = MapNode{
+		ID:    "t3",
+		Owner: &scenario.attackerID,
+		Units: 1,
+	}
+	for _, territoryID := range []MapNodeID{"t4", "t5"} {
+		scenario.room.Territories[territoryID] = MapNode{
+			ID:    territoryID,
+			Owner: &scenario.defenderID,
+			Units: 1,
+		}
+	}
+
+	updatedRoom, err := Attack(scenario.room, scenario.attackerID, scenario.fromID, scenario.toID)
+	if err != nil {
+		t.Fatalf("Attack returned an error: %v", err)
+	}
+
+	if updatedRoom.WinnerID == nil {
+		t.Fatal("winner ID = nil, want attacker ID")
+	}
+	if *updatedRoom.WinnerID != scenario.attackerID {
+		t.Errorf("winner ID = %q, want %q", *updatedRoom.WinnerID, scenario.attackerID)
+	}
+}

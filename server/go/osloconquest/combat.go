@@ -12,6 +12,20 @@ var (
 	ErrAttackWouldLose         = errors.New("attack would result in loss: attacker has fewer units than defender")
 )
 
+func playerTerritoryControl(room Room, playerID PlayerID) float64 {
+	total := len(room.Territories)
+	if total == 0 {
+		return 0
+	}
+	controlled := 0
+	for _, territory := range room.Territories {
+		if territory.Owner != nil && *territory.Owner == playerID {
+			controlled++
+		}
+	}
+	return float64(controlled) / float64(total) * 100
+}
+
 func Attack(room Room, actorID PlayerID, fromID, toID MapNodeID) (Room, error) {
 	if room.ActivePlayerID == nil || *room.ActivePlayerID != actorID {
 		return room, ErrNotActivePlayer
@@ -58,6 +72,11 @@ func Attack(room Room, actorID PlayerID, fromID, toID MapNodeID) (Room, error) {
 
 	room.Territories[fromID] = attackingTerritory
 	room.Territories[toID] = defendingTerritory
+
+	if playerTerritoryControl(room, actorID) >= WinThresholdPercent {
+		room.Phase = PhaseGameOver
+		room.WinnerID = &actorID
+	}
 
 	return room, nil
 }
