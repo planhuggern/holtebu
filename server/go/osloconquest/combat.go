@@ -6,7 +6,8 @@ import (
 )
 
 var (
-	ErrInvalidAttack = errors.New("invalid attack: destination is not an enemy territory")
+	ErrInvalidAttack   = errors.New("invalid attack: destination is not an enemy territory")
+	ErrAttackWouldLose = errors.New("attack would result in loss: attacker has fewer units than defender")
 )
 
 func Attack(room Room, actorID PlayerID, fromID, toID MapNodeID) (Room, error) {
@@ -29,6 +30,10 @@ func Attack(room Room, actorID PlayerID, fromID, toID MapNodeID) (Room, error) {
 		return room, ErrInvalidAttack
 	}
 
+	if attackingTerritory.Units <= defendingTerritory.Units {
+		return room, ErrAttackWouldLose
+	}
+
 	attackingPlayer := playerByID(room.Players, actorID)
 	if attackingPlayer == nil {
 		return room, ErrPlayerNotFound
@@ -41,7 +46,7 @@ func Attack(room Room, actorID PlayerID, fromID, toID MapNodeID) (Room, error) {
 	attackingPlayer.Position = &toID
 	attackingPlayer.MovesRemaining = 0
 	attackingPlayer.ValidMoves = nil
-	
+
 	defendingTerritory.Owner = &actorID
 	defendingTerritory.Units = attackingTerritory.Units - 1
 	attackingTerritory.Units = 1
