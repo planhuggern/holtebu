@@ -195,23 +195,18 @@ Identitetsregel 2026-07-25:
       "Oslo Conquest protokollkontrakt" nedenfor. Første Go-port skal følge
       dagens spillflyt, men med ny identitetskontrakt: `PlayerID` erstatter
       `side`.
-- [ ] **4. Opprett `osloconquest` package med rene domenetyper** — port
-      board-konstanter (`TERRITORY_IDS`, `CHECKPOINT_IDS`, `ADJACENCY`) og
-      definer typed `Room`, `Player`, `Territory`, `PlayerID`, `Phase`. Ikke
-      definer `Side`. Start med tester for initielt rom og board-invarianter.
-      Ikke WebSocket ennå. Lærer: Go-structs, maps/slices, typed constants og
-      table-driven tests.
+- [x] **4. Opprett `osloconquest` package med rene domenetyper** —
+      board-konstanter (`MapNodeIDs`, `CheckpointIDSequence`, `Adjacency`) og
+      typed `Room`, `Player`, `Territory`, `PlayerID` og `Phase` finnes uten
+      `Side`. Tester dekker initielt rom og board-invarianter. Lærer:
+      Go-structs, maps/slices, typed constants og table-driven tests.
 - [x] **5. Port romopprettelse og spillerflyt** — ferdig 2026-07-29.
       Rene funksjoner for waiting- og bot-rom, spillerinnmelding, room-oppslag
       og room-liste. Tester dekker happy path, fullt rom, blank ID, duplikat
       romnavn og spiller i annet rom. `go test ./...` grønt.
-- [ ] **6. Port setup og turregler uten WebSocket** — implementer
-      `choose_start_checkpoint`, `roll_dice`, `move`, `end_turn` og `forfeit`
-      som testbare domenefunksjoner. Gjør terningkast injiserbart i tester
-      (f.eks. liten `Dice`-funksjon), ikke hardkod `rand.Intn` inne i logikken.
-      Lærer: dependency injection i Go uten framework.
-      Status 2026-08-16: `ChooseStartCheckpoint`, setup-delen av `EndTurn`,
-      `RollDice` og `Move` finnes. `RollDice` avviser setup-fasen og bruker
+- [x] **6. Port setup og turregler uten WebSocket** —
+      `ChooseStartCheckpoint`, `RollDice`, `Move`, `EndTurn` og `Forfeit`
+      finnes som testbare domenefunksjoner. `RollDice` bruker
       injiserbar terningfunksjon. Rekkeviddeberegningen for `ValidMoves` er
       ferdig: `reachableMapNodes` i `moves.go` bruker BFS (kø + `distances`-
       map) og sorterer med `slices.Sort`, så hver node kun besøkes via
@@ -221,9 +216,9 @@ Identitetsregel 2026-07-25:
       implementert med konstantene `CheckpointBonusMoney`/`CheckpointBonusUnits`
       i `rules.go` (500/3 etter Django, lette å justere senere).
       `go test ./osloconquest`, `go vet ./osloconquest` og `gofmt` er grønne.
-      Regelen «spilleren kan velge å ikke flytte» ligger i `end_turn` i
-      playing-fasen (jf. Django), ikke i `validMoves`. Neste delsteg:
-      playing-delen av `EndTurn` (med «kan velge å ikke flytte») og `forfeit`.
+      Regelen «spilleren kan velge å ikke flytte» ligger i `EndTurn` i
+      playing-fasen, ikke i `ValidMoves`. Lærer: dependency injection i Go
+      uten framework.
 - [x] **7. Port kampreglene som egen vertikal skive** — angrep starter fra
       spillerens nåværende posisjon og bruker terningkastets gyldige mål som
       rekkevidde. Motspillere og nøytrale territorier kan angripes. Bare
