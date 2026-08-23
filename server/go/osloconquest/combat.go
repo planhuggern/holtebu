@@ -6,10 +6,10 @@ import (
 )
 
 var (
-	ErrInvalidAttack           = errors.New("invalid attack: destination is not an enemy territory")
+	ErrInvalidAttack           = errors.New("invalid attack: destination is out of range or not an enemy territory")
 	ErrInvalidAttackNotOwned   = errors.New("invalid attack: attacking territory not owned by attacker")
 	ErrInvalidAttackNotPresent = errors.New("invalid attack: attacker not present in attacking territory")
-	ErrAttackWouldLose         = errors.New("attack would result in loss: attacker has fewer units than defender")
+	ErrAttackWouldLose         = errors.New("attack would result in loss: attacker does not outnumber defender")
 )
 
 func playerTerritoryControl(room Room, playerID PlayerID) float64 {

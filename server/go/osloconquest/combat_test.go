@@ -294,3 +294,48 @@ func TestAttackDoesNotSetWinnerBelowControlThreshold(t *testing.T) {
 		t.Errorf("phase = %q, want %q", updatedRoom.Phase, PhasePlaying)
 	}
 }
+
+func TestAttackRejectsInvalidTerritoryOwnership(t *testing.T) {
+	tests := []struct {
+		name       string
+		changeRoom func(*attackScenario)
+		wantErr    error
+	}{
+		{
+			name: "source territory belongs to opponent",
+			changeRoom: func(scenario *attackScenario) {
+				territory := scenario.room.Territories[scenario.fromID]
+				territory.Owner = &scenario.defenderID
+				scenario.room.Territories[scenario.fromID] = territory
+			},
+			wantErr: ErrInvalidAttackNotOwned,
+		},
+		{
+			name: "destination territory belongs to attacker",
+			changeRoom: func(scenario *attackScenario) {
+				territory := scenario.room.Territories[scenario.toID]
+				territory.Owner = &scenario.attackerID
+				scenario.room.Territories[scenario.toID] = territory
+			},
+			wantErr: ErrInvalidAttack,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			scenario := newAttackScenario(t, 3, 2)
+			test.changeRoom(&scenario)
+
+			_, err := Attack(
+				scenario.room,
+				scenario.attackerID,
+				scenario.fromID,
+				scenario.toID,
+			)
+
+			if err != test.wantErr {
+				t.Errorf("error = %v, want %v", err, test.wantErr)
+			}
+		})
+	}
+}

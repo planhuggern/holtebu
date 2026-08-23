@@ -224,11 +224,14 @@ Identitetsregel 2026-07-25:
       Regelen «spilleren kan velge å ikke flytte» ligger i `end_turn` i
       playing-fasen (jf. Django), ikke i `validMoves`. Neste delsteg:
       playing-delen av `EndTurn` (med «kan velge å ikke flytte») og `forfeit`.
-- [ ] **7. Port kampreglene som egen vertikal skive** — implementer dagens
-      Django-angrep først (`fromTerritoryId` → `toTerritoryId`) før eventuell
-      full mass-attack fra specen. Test nabo-validering, eier-validering,
-      seier/tap, units-endringer og winner-threshold. Lærer: komplekse
-      state-overganger med små tester.
+- [x] **7. Port kampreglene som egen vertikal skive** — angrep starter fra
+      spillerens nåværende posisjon og bruker terningkastets gyldige mål som
+      rekkevidde. Motspillere og nøytrale territorier kan angripes. Bare
+      vinnende angrep er lov: angriperen må ha flere bataljoner enn målet,
+      én bataljon blir igjen, og resten overtar målet. Ved 60 %
+      territoriekontroll avsluttes spillet med angriperen som vinner. Testet
+      eier-, posisjons- og rekkeviddevalidering, styrke, units-endringer og
+      vinnerterskel. Lærer: komplekse state-overganger med små tester.
 - [ ] **8. Velg WebSocket-bibliotek og lag minimal server** — velg mellom
       stdlib-hijacking, `gorilla/websocket` og `nhooyr.io/websocket` før koding.
       Anbefalt beslutning for læring: bruk et lite bibliotek, sannsynligvis
