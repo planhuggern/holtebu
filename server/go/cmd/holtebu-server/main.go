@@ -88,6 +88,8 @@ func main() {
 		http.DefaultServeMux.ServeHTTP(w, r)
 	})
 
+	registerOsloConquestRoutes(http.DefaultServeMux)
+
 	if err := http.ListenAndServe(addr, handler); err != nil {
 		fmt.Println("Server-feil:", err)
 	}
