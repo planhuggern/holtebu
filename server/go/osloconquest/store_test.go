@@ -27,17 +27,13 @@ func TestRoomStoreCreatesAndGetsWaitingRoom(t *testing.T) {
 	if len(storedRoom.Players) != 1 || storedRoom.Players[0].ID != player.ID {
 		t.Errorf("stored players = %v, want player %q", storedRoom.Players, player.ID)
 	}
-}
 
-func TestRoomStoreCreateWaitingRoomUsesExistingPlayerValidation(t *testing.T) {
-	store := NewRoomStore()
-
-	_, err := store.CreateWaitingRoom("room-1", Player{})
+	_, err = store.CreateWaitingRoom("room-2", Player{})
 
 	if !errors.Is(err, ErrInvalidPlayer) {
 		t.Errorf("error = %v, want ErrInvalidPlayer", err)
 	}
-	if _, found := store.GetRoom("room-1"); found {
+	if _, found := store.GetRoom("room-2"); found {
 		t.Error("invalid player should not create a room")
 	}
 }
