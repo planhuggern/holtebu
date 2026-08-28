@@ -36,6 +36,13 @@ func (store *RoomStore) GetRoom(roomID string) (Room, bool) {
 	return room, exists
 }
 
+func (store *RoomStore) ListRooms() []RoomInfo {
+	store.mu.RLock()
+	defer store.mu.RUnlock()
+	roomInfos := summarizeRooms(store.rooms)
+	return roomInfos
+}
+
 func (store *RoomStore) UpdateRoom(roomID string, updateFunc func(Room) (Room, error)) (Room, error) {
 	store.mu.Lock()
 	defer store.mu.Unlock()

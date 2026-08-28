@@ -65,3 +65,24 @@ func TestRoomStoreUpdatesRoomAndPersistsTheResult(t *testing.T) {
 		t.Errorf("stored player count = %d, want 2", len(storedRoom.Players))
 	}
 }
+
+func TestRoomStoreListsRooms(t *testing.T) {
+	store := NewRoomStore()
+	player := Player{ID: "player-1", Name: "Espen"}
+
+	if _, err := store.CreateWaitingRoom("room-1", player); err != nil {
+		t.Fatalf("CreateWaitingRoom returned an error: %v", err)
+	}
+
+	roomInfos := store.ListRooms()
+
+	if len(roomInfos) != 1 {
+		t.Fatalf("room count = %d, want 1", len(roomInfos))
+	}
+	if roomInfos[0].Room != "room-1" {
+		t.Errorf("room ID = %q, want %q", roomInfos[0].Room, "room-1")
+	}
+	if roomInfos[0].PlayerCount != 1 {
+		t.Errorf("player count = %d, want 1", roomInfos[0].PlayerCount)
+	}
+}
