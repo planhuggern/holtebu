@@ -37,3 +37,31 @@ func TestRoomStoreCreatesAndGetsWaitingRoom(t *testing.T) {
 		t.Error("invalid player should not create a room")
 	}
 }
+
+func TestRoomStoreUpdatesRoomAndPersistsTheResult(t *testing.T) {
+	store := NewRoomStore()
+	firstPlayer := Player{ID: "player-1", Name: "Espen"}
+	secondPlayer := Player{ID: "player-2", Name: "Ada"}
+
+	if _, err := store.CreateWaitingRoom("room-1", firstPlayer); err != nil {
+		t.Fatalf("CreateWaitingRoom returned an error: %v", err)
+	}
+
+	updatedRoom, err := store.UpdateRoom("room-1", func(room Room) (Room, error) {
+		return AddPlayer(room, secondPlayer)
+	})
+	if err != nil {
+		t.Fatalf("UpdateRoom returned an error: %v", err)
+	}
+	if len(updatedRoom.Players) != 2 {
+		t.Errorf("updated player count = %d, want 2", len(updatedRoom.Players))
+	}
+
+	storedRoom, found := store.GetRoom("room-1")
+	if !found {
+		t.Fatal("GetRoom should find the updated room")
+	}
+	if len(storedRoom.Players) != 2 {
+		t.Errorf("stored player count = %d, want 2", len(storedRoom.Players))
+	}
+}
