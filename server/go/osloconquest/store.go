@@ -1,11 +1,8 @@
 package osloconquest
 
 import (
-	"errors"
 	"sync"
 )
-
-var ErrRoomAlreadyExists = errors.New("room already exists")
 
 type RoomStore struct {
 	mu    sync.RWMutex
