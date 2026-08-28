@@ -21,15 +21,12 @@ func NewRoomStore() *RoomStore {
 func (store *RoomStore) CreateWaitingRoom(roomID string, player Player) (Room, error) {
 	store.mu.Lock()
 	defer store.mu.Unlock()
-	if _, exists := store.rooms[roomID]; exists {
-		return Room{}, ErrRoomAlreadyExists
+	rooms, err := createWaitingRoom(store.rooms, roomID, player)
+	if err != nil {
+		return Room{}, err
 	}
-	room := Room{
-		ID:      roomID,
-		Players: []Player{player},
-	}
-	store.rooms[roomID] = room
-	return room, nil
+	store.rooms = rooms
+	return rooms[roomID], nil
 }
 
 func (store *RoomStore) GetRoom(roomID string) (Room, bool) {
