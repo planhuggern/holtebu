@@ -33,7 +33,10 @@ func (store *RoomStore) GetRoom(roomID string) (Room, bool) {
 	store.mu.RLock()
 	defer store.mu.RUnlock()
 	room, exists := store.rooms[roomID]
-	return room, exists
+	if !exists {
+		return Room{}, false
+	}
+	return room.Clone(), true
 }
 
 func (store *RoomStore) ListRooms() []RoomInfo {

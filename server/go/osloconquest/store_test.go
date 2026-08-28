@@ -86,3 +86,26 @@ func TestRoomStoreListsRooms(t *testing.T) {
 		t.Errorf("player count = %d, want 1", roomInfos[0].PlayerCount)
 	}
 }
+
+func TestRoomStoreGetRoomReturnsCopy(t *testing.T) {
+	store := NewRoomStore()
+	player := Player{ID: "player-1", Name: "Espen"}
+
+	if _, err := store.CreateWaitingRoom("room-1", player); err != nil {
+		t.Fatalf("CreateWaitingRoom returned an error: %v", err)
+	}
+
+	room, found := store.GetRoom("room-1")
+	if !found {
+		t.Fatal("GetRoom should find the created room")
+	}
+	room.Players[0].Name = "Changed outside the store"
+
+	storedRoom, found := store.GetRoom("room-1")
+	if !found {
+		t.Fatal("GetRoom should still find the room")
+	}
+	if storedRoom.Players[0].Name != "Espen" {
+		t.Errorf("stored player name = %q, want %q", storedRoom.Players[0].Name, "Espen")
+	}
+}
