@@ -227,13 +227,13 @@ Identitetsregel 2026-07-25:
       territoriekontroll avsluttes spillet med angriperen som vinner. Testet
       eier-, posisjons- og rekkeviddevalidering, styrke, units-endringer og
       vinnerterskel. Lærer: komplekse state-overganger med små tester.
-- [ ] **8. Velg WebSocket-bibliotek og lag minimal server** — velg mellom
-      stdlib-hijacking, `gorilla/websocket` og `nhooyr.io/websocket` før koding.
-      Anbefalt beslutning for læring: bruk et lite bibliotek, sannsynligvis
-      `nhooyr.io/websocket`, og hold resten av koden i egne packages. Lag
-      `cmd/oslo-conquest/main.go` eller wire Oslo Conquest inn i eksisterende
-      `cmd/holtebu-server` etter en eksplisitt beslutning. Lærer:
-      WebSocket-oppgradering, read-loop/write-loop og JSON-protokoll.
+- [x] **8. Velg WebSocket-bibliotek og lag minimal server** — ferdig
+      2026-08-29. Bruker `github.com/coder/websocket`, den vedlikeholdte
+      etterfølgeren til roadmapens opprinnelige `nhooyr.io/websocket`-valg.
+      `osloconquest.WebSocketHandler` godtar oppgraderingen, og den felles
+      `cmd/holtebu-server` ruter `/ws/oslo-conquest/` til handleren. Lesing og
+      skriving av spillmeldinger kommer i handler-steget etter store-en.
+      Lærer: WebSocket-oppgradering og HTTP-routing.
 - [ ] **9. Implementer concurrency-sikker room store** — erstatt Django sin
       globale `_rooms` med en Go-store. Start med `sync.Mutex`/`sync.RWMutex`
       rundt map for enkelhet; vurder per-room goroutine/channels senere hvis
