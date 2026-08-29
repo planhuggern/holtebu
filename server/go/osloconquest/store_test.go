@@ -2,6 +2,8 @@ package osloconquest
 
 import (
 	"errors"
+	"fmt"
+	"sync"
 	"testing"
 )
 
@@ -107,5 +109,34 @@ func TestRoomStoreGetRoomReturnsCopy(t *testing.T) {
 	}
 	if storedRoom.Players[0].Name != "Espen" {
 		t.Errorf("stored player name = %q, want %q", storedRoom.Players[0].Name, "Espen")
+	}
+}
+
+func TestRoomStoreCreatesRoomsConcurrently(t *testing.T) {
+	store := NewRoomStore()
+	const roomCount = 10
+
+	errCh := make(chan error, roomCount)
+	var waitGroup sync.WaitGroup
+	for i := range roomCount {
+		waitGroup.Add(1)
+		go func() {
+			defer waitGroup.Done()
+			roomID := fmt.Sprintf("room-%d", i)
+			player := Player{ID: PlayerID(fmt.Sprintf("player-%d", i))}
+			if _, err := store.CreateWaitingRoom(roomID, player); err != nil {
+				errCh <- err
+			}
+		}()
+	}
+	waitGroup.Wait()
+	close(errCh)
+
+	for err := range errCh {
+		t.Errorf("CreateWaitingRoom returned an error: %v", err)
+	}
+
+	if roomInfos := store.ListRooms(); len(roomInfos) != roomCount {
+		t.Errorf("room count = %d, want %d", len(roomInfos), roomCount)
 	}
 }
