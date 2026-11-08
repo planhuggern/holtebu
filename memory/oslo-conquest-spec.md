@@ -1,7 +1,7 @@
 # Oslo Conquest – Spec
 
 ## Hva er dette?
-Et turbasert strategispill inspirert av Risk + Monopol, satt til Oslo. Spilles i nettleseren. Multiplayer via WebSocket mot en Django Channels-backend. Kjøres som en egen SPA innenfor poker-clock-portalen.
+Et turbasert strategispill inspirert av Risk + Monopol, satt til Oslo. Spilles i nettleseren. Multiplayer via WebSocket mot en Django Channels-backend. Kjøres som en egen SPA innenfor Holtebu-portalen.
 
 ## Spillregler
 - **2–6 spillere**, alle starter med 2000 kr og 10 bataljoner ved Lørenskog

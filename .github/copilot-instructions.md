@@ -1,8 +1,8 @@
-# Poker-Clock – Project
+# Holtebu Portal – Project
 
 > Kilde: AGENTS.md er autoritativ — hold disse to filene i sync.
 
-Multi-app portal: `poker-clock` (tournament clock) and `oslo-conquest` (strategy game) share the same Django backend and static file server.
+Holtebu is a multi-app portal: `poker-clock` (tournament clock), `oslo-conquest` (strategy game), and `trading` (trading dashboard) share the same Django backend and static file server.
 
 ## Commands
 

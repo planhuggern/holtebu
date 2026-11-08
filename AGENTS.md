@@ -1,6 +1,6 @@
-# Poker-Clock – Project
+# Holtebu Portal – Project
 
-Multi-app portal:
+Holtebu is a multi-app portal:
 
 - `poker-clock` (tournament clock)
 - `oslo-conquest` (strategy game)

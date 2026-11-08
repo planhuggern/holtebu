@@ -1,4 +1,4 @@
-# Docker Compose for poker-clock-portalen.
+# Docker Compose for Holtebu Portal.
 # Foreløpig kun Postgres-tjenesten; appene legges til etter hvert.
 services:
   db:

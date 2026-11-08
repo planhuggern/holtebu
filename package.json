@@ -1,5 +1,5 @@
 {
-  "name": "poker-clock-dev",
+  "name": "holtebu-portal",
   "private": true,
   "scripts": {
     "dev": "concurrently --names VITE,DJANGO,GO --prefix-colors cyan,green,yellow \"npm run dev --prefix client-react\" \"npm run dev:server\" \"npm run dev:go\"",
