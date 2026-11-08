@@ -5,7 +5,7 @@ set -euo pipefail
 #
 # Første steg: klon eller oppdater dette repoet fra GitHub (HTTPS)
 
-GIT_REPO="https://github.com/planhuggern/poker-clock.git"  # Sett til riktig repo-URL
+GIT_REPO="https://github.com/planhuggern/holtebu.git"  # Sett til riktig repo-URL
 # Bruk hjemmemappen til brukeren som startet sudo, ikke root
 if [[ -n "${SUDO_USER:-}" && "$SUDO_USER" != "root" ]]; then
   REAL_HOME="$(getent passwd "$SUDO_USER" | cut -d: -f6)"
