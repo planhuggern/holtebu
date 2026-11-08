@@ -12,12 +12,12 @@ if [[ -n "${SUDO_USER:-}" && "$SUDO_USER" != "root" ]]; then
 else
   REAL_HOME="$HOME"
 fi
-REPO_DIR="$REAL_HOME/poker-clock"
+REPO_DIR="$REAL_HOME/holtebu"
 #
 # What it does:
 # - Installs Traefik binary (from GitHub releases)
 # - Writes static config: /etc/traefik/traefik.yml
-# - Writes dynamic config: /etc/traefik/dynamic/poker-clock.yml
+# - Writes dynamic config: /etc/traefik/dynamic/holtebu.yml
 # - Writes systemd unit: /etc/systemd/system/traefik.service
 # - Enables + starts Traefik
 #
@@ -229,14 +229,19 @@ EOF
 
   # Dynamic config: symlink til repo-filen så den oppdateres automatisk med git pull.
   # Filen inneholder ruter for både Django og Go-serveren.
-  local dynamic_target="/etc/traefik/dynamic/poker-clock.yml"
-  local dynamic_source="$REPO_DIR/traefik/prod/poker-clock.yml"
+  local dynamic_target="/etc/traefik/dynamic/holtebu.yml"
+  local dynamic_source="$REPO_DIR/traefik/prod/holtebu.yml"
   if [[ -L "$dynamic_target" && "$(readlink "$dynamic_target")" == "$dynamic_source" ]]; then
     log "Traefik dynamic config: symlink finnes allerede – hopper over"
   else
     log "Setter opp symlink: $dynamic_target -> $dynamic_source"
     rm -f "$dynamic_target"
     ln -s "$dynamic_source" "$dynamic_target"
+  fi
+  local legacy_target="/etc/traefik/dynamic/poker-clock.yml"
+  local legacy_source="$REAL_HOME/poker-clock/traefik/prod/poker-clock.yml"
+  if [[ -L "$legacy_target" && "$(readlink "$legacy_target")" == "$legacy_source" ]]; then
+    rm "$legacy_target"
   fi
 
   # Ensure ACME storage exists and is private
@@ -385,7 +390,7 @@ write_holtebu_server_systemd_unit() {
   cat > /etc/systemd/system/holtebu-server.service <<EOF
 [Unit]
 Description=Holtebu Server (Go)
-After=network.target poker-clock.service
+After=network.target holtebu-portal.service
 
 [Service]
 Type=simple
@@ -412,11 +417,11 @@ write_django_systemd_unit() {
   local server_dir="$REPO_DIR/server"
   local venv_dir="$server_dir/.venv"
 
-  log "Skriver systemd-unit for poker-clock (Daphne)"
+  log "Skriver systemd-unit for holtebu-portal (Daphne)"
 
-  cat > /etc/systemd/system/poker-clock.service <<EOF
+  cat > /etc/systemd/system/holtebu-portal.service <<EOF
 [Unit]
-Description=Poker Clock (Django/Daphne)
+Description=Holtebu Portal (Django/Daphne)
 After=network.target
 
 [Service]
@@ -434,13 +439,18 @@ RestartSec=3
 WantedBy=multi-user.target
 EOF
 
+  if [[ -f /etc/systemd/system/poker-clock.service ]]; then
+    systemctl stop poker-clock
+    systemctl disable poker-clock
+    rm /etc/systemd/system/poker-clock.service
+  fi
   systemctl daemon-reload
-  systemctl enable poker-clock
-  systemctl restart poker-clock
+  systemctl enable holtebu-portal
+  systemctl restart holtebu-portal
   sleep 2
-  systemctl is-active --quiet poker-clock \
-    && log "poker-clock service: active" \
-    || { log "ADVARSEL: poker-clock er IKKE aktiv. Sjekk: systemctl status poker-clock"; systemctl status poker-clock --no-pager || true; }
+  systemctl is-active --quiet holtebu-portal \
+    && log "holtebu-portal service: active" \
+    || { log "ADVARSEL: holtebu-portal er IKKE aktiv. Sjekk: systemctl status holtebu-portal"; systemctl status holtebu-portal --no-pager || true; }
 }
 
 main() {
@@ -487,7 +497,7 @@ main() {
   log "  Traefik:        https://${DOMAIN}${BASE_PATH}"
   log "  Django app:     http://127.0.0.1:8000  (via Traefik -> HTTPS)"
   log "  Go server:      http://127.0.0.1:8082  (via Traefik -> ${BASE_PATH}/api/)"
-  log "  Logg Django:    journalctl -u poker-clock -f"
+  log "  Logg Django:    journalctl -u holtebu-portal -f"
   log "  Logg Go:        journalctl -u holtebu-server -f"
   sleep 1
   netstat -tuln

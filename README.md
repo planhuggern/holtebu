@@ -1,4 +1,4 @@
-# poker-clock portal
+# Holtebu portal
 Multi-app portal med felles Django-backend og Vite-frontend. Backend: Django + Channels (Python). Frontend: React/Preact (Vite).
 
 ## Apper
@@ -147,12 +147,12 @@ sudo ./bootstrap.sh \
 
 Scriptet gjør alt i én operasjon:
 - Installerer Traefik som systemd-tjeneste (port 80/443, Let's Encrypt)
-- Skriver `/etc/traefik/dynamic/poker-clock.yml` (berører ikke andres konfig)
+- Skriver `/etc/traefik/dynamic/holtebu.yml` (berører ikke andres konfig)
 - Oppretter Python venv og installerer `requirements.txt`
 - Kjører Django-migrasjoner
 - Bygger React-klienten med `VITE_BASE_PATH=/pokerklokke/`
-- Kopierer build til `~/poker-clock/server/public/pokerklokke/`
-- Starter `poker-clock.service` (Daphne på `127.0.0.1:8000`)
+- Kopierer build til `~/holtebu/server/public/pokerklokke/`
+- Starter `holtebu-portal.service` (Daphne på `127.0.0.1:8000`)
 
 ### 2. Opprett config.json på VPS (første gang)
 
@@ -160,7 +160,7 @@ Bootstrap-scriptet oppretter ikke `config.json` (den er gitignored og inneholder
 Lag den manuelt på VPS-en:
 
 ```bash
-cat > ~/poker-clock/server/config.json <<'EOF'
+cat > ~/holtebu/server/config.json <<'EOF'
 {
   "jwtSecret": "<generer med: python3 -c 'import secrets; print(secrets.token_hex(50))'>",
   "djangoSecret": "<en annen lang tilfeldig streng>",
@@ -179,7 +179,7 @@ cat > ~/poker-clock/server/config.json <<'EOF'
   "sqlite_file": "./data/pokerclock.sqlite"
 }
 EOF
-sudo systemctl restart poker-clock
+sudo systemctl restart holtebu-portal
 ```
 
 **GCP Console:** Legg til `https://espen.holtebu.eu/pokerklokke/auth/google/callback`
@@ -192,19 +192,19 @@ Push til `main` → GitHub Actions deployer automatisk via SSH.
 **På VPS-en:**
 ```bash
 # Generer et dedikert deploy-keypair
-ssh-keygen -t ed25519 -C "github-deploy" -f ~/.ssh/poker-clock-deploy -N ""
+ssh-keygen -t ed25519 -C "github-deploy" -f ~/.ssh/holtebu-deploy -N ""
 
 # Autoriser nøkkelen
-cat ~/.ssh/poker-clock-deploy.pub >> ~/.ssh/authorized_keys
+cat ~/.ssh/holtebu-deploy.pub >> ~/.ssh/authorized_keys
 chmod 600 ~/.ssh/authorized_keys
 
-# Tillat passwordless restart av tjenesten + chown av public-mappen
-echo "espenhoh ALL=(ALL) NOPASSWD: /bin/systemctl restart poker-clock, /usr/bin/chown -R espenhoh /home/espenhoh/poker-clock/server/public, /bin/chown -R espenhoh /home/espenhoh/poker-clock/server/public" \
-  | sudo tee /etc/sudoers.d/poker-clock-deploy
-sudo chmod 440 /etc/sudoers.d/poker-clock-deploy
+# Tillat passwordless restart av portal- og Go-tjenesten
+echo "espenhoh ALL=(ALL) NOPASSWD: /bin/systemctl restart holtebu-portal, /bin/systemctl restart holtebu-server" \
+  | sudo tee /etc/sudoers.d/holtebu-deploy
+sudo chmod 440 /etc/sudoers.d/holtebu-deploy
 
 # Kopier privat-nøkkelen — du trenger innholdet til GitHub Secrets
-cat ~/.ssh/poker-clock-deploy
+cat ~/.ssh/holtebu-deploy
 ```
 
 **I GitHub** (Settings → Secrets and variables → Actions):
@@ -213,7 +213,7 @@ cat ~/.ssh/poker-clock-deploy
 |--------|-------|
 | `VPS_HOST` | `espen.holtebu.eu` |
 | `VPS_USER` | `espenhoh` |
-| `VPS_SSH_KEY` | innholdet av `~/.ssh/poker-clock-deploy` (hele filen inkl. `-----BEGIN/END-----`) |
+| `VPS_SSH_KEY` | innholdet av `~/.ssh/holtebu-deploy` (hele filen inkl. `-----BEGIN/END-----`) |
 
 Etter dette: push til `main` deployer automatisk.
 Manuell kjøring: GitHub → Actions → *Deploy to VPS* → *Run workflow*.
@@ -224,7 +224,7 @@ Bootstrap-scriptet er idempotent — kjør den samme kommandoen igjen:
 
 ```bash
 ssh vps
-sudo ~/poker-clock/bootstrap.sh \
+sudo ~/holtebu/bootstrap.sh \
   --domain espen.holtebu.eu \
   --email espen.holtebu@gmail.com \
   --base-path /pokerklokke
@@ -234,7 +234,7 @@ Repo pulles, venv oppdateres, React bygges og tjenesten restartes automatisk.
 
 Sjekk logg:
 ```bash
-journalctl -u poker-clock -f
+journalctl -u holtebu-portal -f
 journalctl -u traefik -f
 ```
 
@@ -303,7 +303,6 @@ sudo ufw allow 443
 sudo ufw enable
 sudo ufw status
 ```
-
 
 
 

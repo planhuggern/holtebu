@@ -6,7 +6,7 @@
 
 [Unit]
 Description=Holtebu Server (Go)
-After=network.target poker-clock.service
+After=network.target holtebu-portal.service
 
 [Service]
 Type=simple

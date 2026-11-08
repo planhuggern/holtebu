@@ -19,7 +19,7 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             set -euo pipefail
-            REPO="$HOME/poker-clock"
+            REPO="$HOME/holtebu"
             BASE_PATH="/pokerklokke"
             VENV="$REPO/server/.venv/bin"
 
@@ -50,7 +50,6 @@ jobs:
 
 
             echo "=== copy dist ==="
-            sudo chown -R "$(whoami)" "$REPO/server/public"
             mkdir -p "$REPO/server/public${BASE_PATH}"
             cp -r "$REPO/client-react/dist/." "$REPO/server/public${BASE_PATH}/"
 
@@ -60,9 +59,9 @@ jobs:
             go build -o holtebu-server ./cmd/holtebu-server
 
             echo "=== restart services ==="
-            sudo systemctl restart poker-clock
+            sudo systemctl restart holtebu-portal
             sudo systemctl restart holtebu-server
             sleep 2
-            systemctl is-active poker-clock
+            systemctl is-active holtebu-portal
             systemctl is-active holtebu-server
             echo "=== deploy OK ==="

@@ -1,21 +1,21 @@
-# Eksempel på Traefik dynamic config for poker-clock.
-# bootstrap.sh genererer dette automatisk til /etc/traefik/dynamic/poker-clock.yml.
+# Eksempel på Traefik dynamic config for Holtebu Portal.
+# bootstrap.sh genererer dette automatisk til /etc/traefik/dynamic/holtebu.yml.
 # Denne filen er kun referanse/mal.
 
 http:
   routers:
-    poker-clock:
+    holtebu-portal:
       rule: "Host(`example.com`) && PathPrefix(`/pokerklokke`)"
       entryPoints:
         - websecure
       tls:
         certResolver: letsencrypt
-      service: poker-clock-backend
+      service: holtebu-portal-backend
       middlewares:
         - strip-basepath-pokerclock
 
   services:
-    poker-clock-backend:
+    holtebu-portal-backend:
       loadBalancer:
         servers:
           - url: "http://127.0.0.1:8000"

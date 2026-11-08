@@ -4,13 +4,13 @@
 
 http:
   routers:
-    poker-clock:
+    holtebu-portal:
       rule: "Host(`espen.holtebu.eu`) && PathPrefix(`/pokerklokke`)"
       entryPoints:
         - websecure
       tls:
         certResolver: letsencrypt
-      service: poker-clock-backend
+      service: holtebu-portal-backend
       priority: 100
 
     holtebu-server:
@@ -25,7 +25,7 @@ http:
       priority: 200
 
   services:
-    poker-clock-backend:
+    holtebu-portal-backend:
       loadBalancer:
         servers:
           - url: "http://127.0.0.1:8000"
