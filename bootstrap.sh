@@ -238,12 +238,6 @@ EOF
     rm -f "$dynamic_target"
     ln -s "$dynamic_source" "$dynamic_target"
   fi
-  local legacy_target="/etc/traefik/dynamic/poker-clock.yml"
-  local legacy_source="$REAL_HOME/poker-clock/traefik/prod/poker-clock.yml"
-  if [[ -L "$legacy_target" && "$(readlink "$legacy_target")" == "$legacy_source" ]]; then
-    rm "$legacy_target"
-  fi
-
   # Ensure ACME storage exists and is private
   if [[ ! -f /var/lib/traefik/acme.json ]]; then
     install -m 0600 -o "$TRAEFIK_USER" -g "$TRAEFIK_GROUP" /dev/null /var/lib/traefik/acme.json
@@ -340,7 +334,7 @@ setup_django() {
   # Bygg React (med riktig base path slik at assets-URLs stemmer)
   local client_dir="$REPO_DIR/client-react"
   local public_dir="$server_dir/public"
-  # Hvert app får sin egen undermappe: public/<base-path>/ (f.eks. public/poker-clock/)
+  # Hvert app får sin egen undermappe: public/<base-path>/ (f.eks. public/<app>/)
   local spa_dir="${public_dir}${BASE_PATH}"
   log "Bygger React-klienten (VITE_BASE_PATH=${BASE_PATH}/)"
   sudo -u "$APP_USER" bash -c "cd '$client_dir' && npm install --silent && VITE_BASE_PATH='${BASE_PATH}/' npm run build --silent"
@@ -439,11 +433,6 @@ RestartSec=3
 WantedBy=multi-user.target
 EOF
 
-  if [[ -f /etc/systemd/system/poker-clock.service ]]; then
-    systemctl stop poker-clock
-    systemctl disable poker-clock
-    rm /etc/systemd/system/poker-clock.service
-  fi
   systemctl daemon-reload
   systemctl enable holtebu-portal
   systemctl restart holtebu-portal

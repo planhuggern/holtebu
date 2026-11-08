@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-KEY_NAME="id_ed25519_poker_clock"
+KEY_NAME="id_ed25519_holtebu"
 COMMENT=""
 FORCE=0
 ADD_TO_AGENT=1
@@ -15,7 +15,7 @@ Usage:
   ./scripts/setup-ssh-keys.sh [options]
 
 Options:
-  --key-name NAME        Default: id_ed25519_poker_clock
+  --key-name NAME        Default: id_ed25519_holtebu
   --comment TEXT         Key comment (e.g. your email)
   --force                Overwrite existing key files
   --no-agent             Do not run ssh-agent / ssh-add

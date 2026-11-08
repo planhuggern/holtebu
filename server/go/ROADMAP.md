@@ -234,11 +234,13 @@ Identitetsregel 2026-07-25:
       `cmd/holtebu-server` ruter `/ws/oslo-conquest/` til handleren. Lesing og
       skriving av spillmeldinger kommer i handler-steget etter store-en.
       Lærer: WebSocket-oppgradering og HTTP-routing.
-- [ ] **9. Implementer concurrency-sikker room store** — erstatt Django sin
-      globale `_rooms` med en Go-store. Start med `sync.Mutex`/`sync.RWMutex`
-      rundt map for enkelhet; vurder per-room goroutine/channels senere hvis
-      behovet faktisk oppstår. Test med parallelle room-operasjoner. Lærer:
-      race-sikker delt tilstand; kjør `go test -race ./...` når mulig.
+- [x] **9. Implementer concurrency-sikker room store** — ferdig
+      2026-08-29. `RoomStore` eier rommene i et `map[string]Room` bak
+      `sync.RWMutex`. Opprettelse og oppdatering bruker write-lås; oppslag og
+      room-liste bruker read-lås. Oppslag gir kopi av rommet, så state ikke kan
+      endres utenfor store-en. Tester dekker parallelle opprettelser og
+      oppdateringer, og `go test -race ./...` er grønn. Lærer: race-sikker
+      delt tilstand.
 - [ ] **10. Koble WebSocket-handlers til domenelogikken** — støtt minst
       `create_game`, `create_game_with_bot`, `join_game`, `rejoin_game`,
       `list_rooms`, `choose_start_checkpoint`, `roll_dice`, `move`, `attack`,

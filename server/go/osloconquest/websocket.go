@@ -6,7 +6,7 @@ import (
 	"github.com/coder/websocket"
 )
 
-func WebSocketHandler() http.Handler {
+func WebSocketHandler(store *RoomStore) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		conn, err := websocket.Accept(w, r, nil)
 		if err != nil {

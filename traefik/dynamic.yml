@@ -12,7 +12,7 @@ http:
         certResolver: letsencrypt
       service: holtebu-portal-backend
       middlewares:
-        - strip-basepath-pokerclock
+        - strip-portal-basepath
 
   services:
     holtebu-portal-backend:
@@ -21,7 +21,7 @@ http:
           - url: "http://127.0.0.1:8000"
 
   middlewares:
-    strip-basepath-pokerclock:
+    strip-portal-basepath:
       stripPrefix:
         prefixes:
           - "/pokerklokke"

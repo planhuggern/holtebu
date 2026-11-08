@@ -7,9 +7,9 @@ services:
     ports:
       - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-pokerclock}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-pokerclock}
-      POSTGRES_DB: ${POSTGRES_DB:-pokerclock}
+      POSTGRES_USER: ${POSTGRES_USER:-holtebu}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-holtebu-local-dev}
+      POSTGRES_DB: ${POSTGRES_DB:-holtebu}
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:

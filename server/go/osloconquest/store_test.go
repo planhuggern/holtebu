@@ -140,3 +140,42 @@ func TestRoomStoreCreatesRoomsConcurrently(t *testing.T) {
 		t.Errorf("room count = %d, want %d", len(roomInfos), roomCount)
 	}
 }
+
+func TestRoomStoreUpdatesRoomConcurrently(t *testing.T) {
+	store := NewRoomStore()
+	player := Player{ID: "player-1", Name: "Espen"}
+	if _, err := store.CreateWaitingRoom("room-1", player); err != nil {
+		t.Fatalf("CreateWaitingRoom returned an error: %v", err)
+	}
+
+	const updateCount = 10
+	errCh := make(chan error, updateCount)
+	var waitGroup sync.WaitGroup
+	for range updateCount {
+		waitGroup.Add(1)
+		go func() {
+			defer waitGroup.Done()
+			_, err := store.UpdateRoom("room-1", func(room Room) (Room, error) {
+				room.Players[0].Money++
+				return room, nil
+			})
+			if err != nil {
+				errCh <- err
+			}
+		}()
+	}
+	waitGroup.Wait()
+	close(errCh)
+
+	for err := range errCh {
+		t.Errorf("UpdateRoom returned an error: %v", err)
+	}
+
+	storedRoom, found := store.GetRoom("room-1")
+	if !found {
+		t.Fatal("GetRoom should find the updated room")
+	}
+	if storedRoom.Players[0].Money != updateCount {
+		t.Errorf("money = %d, want %d", storedRoom.Players[0].Money, updateCount)
+	}
+}

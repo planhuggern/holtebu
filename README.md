@@ -92,7 +92,7 @@ docker compose ps
 ```
 
 Tilkobling: `localhost:5432` med credentials fra `.env` (default:
-`pokerclock` / `pokerclock`, database `pokerclock`). `.env` er gitignored –
+`holtebu` / `holtebu-local-dev`, database `holtebu`). `.env` er gitignored –
 bruk `.env.example` som mal.
 
 Stopp uten å slette data:
@@ -275,7 +275,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/setup-ssh-keys.ps1 `
 
 Kopier nøkkelen til VPS:
 ```bash
-Get-Content $env:USERPROFILE\.ssh\id_ed25519_poker_clock.pub | ssh espenhoh@espen.holtebu.eu `
+Get-Content $env:USERPROFILE\.ssh\id_ed25519_holtebu.pub | ssh espenhoh@espen.holtebu.eu `
   "mkdir -p ~/.ssh; chmod 700 ~/.ssh; cat >> ~/.ssh/authorized_keys; chmod 600 ~/.ssh/authorized_keys"
 ```
 
@@ -303,6 +303,5 @@ sudo ufw allow 443
 sudo ufw enable
 sudo ufw status
 ```
-
 
 

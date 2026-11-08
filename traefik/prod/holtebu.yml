@@ -21,7 +21,7 @@ http:
         certResolver: letsencrypt
       service: holtebu-server-backend
       middlewares:
-        - strip-pokerklokke
+        - strip-portal-basepath
       priority: 200
 
   services:
@@ -36,7 +36,7 @@ http:
           - url: "http://127.0.0.1:8082"
 
   middlewares:
-    strip-pokerklokke:
+    strip-portal-basepath:
       stripPrefix:
         prefixes:
           - "/pokerklokke"

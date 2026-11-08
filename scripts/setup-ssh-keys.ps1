@@ -1,5 +1,5 @@
 Param(
-  [string]$KeyName = "id_ed25519_poker_clock",
+  [string]$KeyName = "id_ed25519_holtebu",
   [string]$Comment = "",
   [switch]$Force,
   [switch]$NoAgent,

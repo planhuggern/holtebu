@@ -4,11 +4,13 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"holtebu-server/osloconquest"
 )
 
 func TestRegisterOsloConquestRoutesServesWebSocketEndpoint(t *testing.T) {
 	mux := http.NewServeMux()
-	registerOsloConquestRoutes(mux)
+	registerOsloConquestRoutes(mux, osloconquest.NewRoomStore())
 
 	server := httptest.NewServer(mux)
 	defer server.Close()
